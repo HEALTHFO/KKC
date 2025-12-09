@@ -334,8 +334,9 @@
                     <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Room Category</label>
                     <select id="ui_roomCat" onchange="renderUI()" aria-label="Room category"></select>
                     <span class="print-value-display hidden font-medium text-gray-800" id="print_roomCat"></span>
-                    <button onclick="addRoomDays()" class="no-print mt-1 text-[9px] text-[var(--accent-color)] underline hover:text-[var(--accent-color-hover)]">Auto‑Calc</button>
-                    <button onclick="openMultiStayModal()" class="no-print mt-1 ml-2 text-[9px] text-[var(--accent-color)] underline hover:text-[var(--accent-color-hover)]">Add Stay</button>
+                    <!-- Enlarge the Auto‑Calc and Add Stay buttons for improved usability -->
+                    <button onclick="addRoomDays()" class="no-print mt-1 mr-2 px-3 py-1 text-xs font-bold rounded shadow bg-[var(--primary-blue)] text-white hover:bg-blue-900 transition">Auto‑Calc</button>
+                    <button onclick="openMultiStayModal()" class="no-print mt-1 px-3 py-1 text-xs font-bold rounded shadow bg-[var(--accent-color)] text-white hover:bg-[var(--accent-color-hover)] transition">Add Stay</button>
                     <!-- Informative summary of the auto‑calculation based on selected dates -->
                     <div id="autoCalcInfo" class="hidden mt-1 text-[10px] text-gray-500 italic"></div>
                 </div>
@@ -1050,31 +1051,51 @@
             // Refresh auto‑calculation summary whenever the UI rerenders
             if (typeof updateAutoCalcInfo === 'function') updateAutoCalcInfo();
 
-            // Generate a discharge summary based on current inputs.  This
-            // summary is automatically constructed but can be customised in
-            // future iterations if needed.
+            // Update the discharge summary with narrative details if available.
             const summaryEl = document.getElementById('dischargeSummary');
             if (summaryEl) {
-                const name = document.getElementById('ui_name').value || 'Patient';
-                const uhid = document.getElementById('ui_uhid').value || '';
-                const ip = document.getElementById('ui_ip').value || '';
-                const doa = document.getElementById('ui_doa').value;
-                const dod = document.getElementById('ui_dod').value;
-                const roomCat = document.getElementById('ui_roomCat').value || '';
-                const doc = document.getElementById('ui_doc').value || '';
-                const gross = document.getElementById('ui_s_gross').innerText || '0.00';
-                const netBill = document.getElementById('ui_s_net_bill').innerText || '0.00';
-                const due = document.getElementById('ui_s_final').innerText || '0.00';
-                let days = 0;
-                if (doa && dod) {
-                    const s = new Date(doa);
-                    const e = new Date(dod);
-                    days = Math.max(1, Math.ceil((e - s) / (1000 * 60 * 60 * 24)));
+                // Build a summary using the discharge summary form data
+                let summaryHtml = '';
+                try {
+                    const data = (typeof getSummaryData === 'function') ? getSummaryData() : {};
+                    // Basic patient info
+                    const name = document.getElementById('ui_name').value || data.name || 'Patient';
+                    const uhid = document.getElementById('ui_uhid').value || data.regno || '';
+                    const ip = document.getElementById('ui_ip').value || data.ipdno || '';
+                    const doa = document.getElementById('ui_doa').value || data.doa || '';
+                    const dod = document.getElementById('ui_dod').value || data.dod || '';
+                    const roomCat = document.getElementById('ui_roomCat').value || data.category || '';
+                    const doc = document.getElementById('ui_doc').value || data.consultant || '';
+                    let days = 0;
+                    if (doa && dod) {
+                        const s = new Date(doa);
+                        const e = new Date(dod);
+                        days = Math.max(1, Math.ceil((e - s) / (1000 * 60 * 60 * 24)));
+                    }
+                    const doaFmt = window.formatDate(doa);
+                    const dodFmt = window.formatDate(dod);
+                    summaryHtml += `<p><strong>${name}</strong> (UHID: ${uhid}, IP: ${ip}) was admitted on <strong>${doaFmt}</strong> and discharged on <strong>${dodFmt}</strong> after <strong>${days}</strong> day${days > 1 ? 's' : ''} in <strong>${roomCat}</strong> under <strong>${doc}</strong>.</p>`;
+                    // If narrative sections are available, display them
+                    const fields = {
+                        diagnosis: 'Diagnosis',
+                        procedure: 'Operation / Procedure',
+                        chief: 'Chief Complaint',
+                        history: 'History of Present Illness',
+                        pastMed: 'Past Medical History',
+                        exam: 'Physical Examination',
+                        course: 'Course During Hospital Stay',
+                        advice: 'Discharge Advice',
+                        follow: 'Follow Up'
+                    };
+                    Object.keys(fields).forEach(key => {
+                        if (data[key]) {
+                            summaryHtml += `<p><strong>${fields[key]}:</strong> ${data[key]}</p>`;
+                        }
+                    });
+                } catch (err) {
+                    console.warn('Error building discharge summary', err);
                 }
-                const doaFmt = window.formatDate(doa);
-                const dodFmt = window.formatDate(dod);
-                summaryEl.innerHTML = `<p><strong>${name}</strong> (UHID: ${uhid}, IP: ${ip}) was admitted on <strong>${doaFmt}</strong> and discharged on <strong>${dodFmt}</strong> after <strong>${days}</strong> day${days > 1 ? 's' : ''} in <strong>${roomCat}</strong> under <strong>${doc}</strong>.</p>
-                <p>The total gross bill amount is <strong>₹${gross}</strong> and the final payable amount after discounts and receipts is <strong>₹${netBill}</strong>. Remaining balance due is <strong>₹${due}</strong>.</p>`;
+                summaryEl.innerHTML = summaryHtml;
             }
 
             // Keep discharge summary header fields in sync with billing details
