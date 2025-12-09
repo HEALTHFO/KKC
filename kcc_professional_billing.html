@@ -339,6 +339,9 @@
                     <button onclick="openMultiStayModal()" class="no-print mt-1 px-3 py-1 text-xs font-bold rounded shadow bg-[var(--accent-color)] text-white hover:bg-[var(--accent-color-hover)] transition">Add Stay</button>
                     <!-- Informative summary of the auto‑calculation based on selected dates -->
                     <div id="autoCalcInfo" class="hidden mt-1 text-[10px] text-gray-500 italic"></div>
+
+                    <!-- Visual bar to display stay segments within the admission period -->
+                    <div id="stayBar" class="mt-1 h-4 w-full bg-gray-200 rounded overflow-hidden hidden"></div>
                 </div>
                 <!-- Row 3 -->
                 <div>
@@ -535,8 +538,8 @@
             <button onclick="openAddTariffModal()" class="bg-[var(--primary-blue)] text-white px-4 py-2 rounded text-xs font-bold">+ ADD ITEM</button>
         </div>
 
-    <!-- VIEW: DISCHARGE SUMMARY -->
-    <div id="view-summary" class="container-main hidden bg-white shadow p-8 min-h-screen flex flex-col">
+    <!-- VIEW: DISCHARGE SUMMARY (nested) -->
+    <div id="view-summary-nested" class="container-main hidden bg-white shadow p-8 min-h-screen flex flex-col hidden">
         <h2 class="text-2xl font-bold text-center mb-4">Discharge Summary</h2>
         <div class="flex-grow overflow-y-auto">
             <!-- Header details table -->
@@ -733,28 +736,6 @@
             </div>
         </div>
 
-        <!-- Multi‑Stay Modal: allows adding a stay with custom date range and room category -->
-        <div id="multiStayModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-            <div class="bg-white p-6 rounded shadow-lg w-80">
-                <h3 class="font-bold text-lg mb-4 text-gray-800">Add Stay</h3>
-                <div class="mb-2">
-                    <label class="text-xs font-bold text-gray-600 block mb-1">Start Date</label>
-                    <input type="date" id="ms_start" class="border p-2 w-full text-xs" aria-label="Stay start date">
-                </div>
-                <div class="mb-2">
-                    <label class="text-xs font-bold text-gray-600 block mb-1">End Date</label>
-                    <input type="date" id="ms_end" class="border p-2 w-full text-xs" aria-label="Stay end date">
-                </div>
-                <div class="mb-4">
-                    <label class="text-xs font-bold text-gray-600 block mb-1">Room Category</label>
-                    <select id="ms_category" class="border p-2 w-full text-xs" aria-label="Stay room category"></select>
-                </div>
-                <div class="flex justify-end gap-2">
-                    <button onclick="closeMultiStayModal()" class="px-3 py-1 bg-gray-200 rounded text-xs">Cancel</button>
-                    <button onclick="addStay()" class="px-3 py-1 bg-[var(--primary-blue)] text-white rounded text-xs">Add</button>
-                </div>
-            </div>
-        </div>
     </div>
     <!-- Tariff add/edit modal -->
     <div id="tariffAddModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
@@ -771,6 +752,151 @@
             </div>
         </div>
     </div>
+
+    <!-- Multi‑Stay Modal: allows adding a stay with custom date range and room category.  Placed outside of any specific view so that it can be opened from any tab. -->
+    <div id="multiStayModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded shadow-lg w-80">
+            <h3 class="font-bold text-lg mb-4 text-gray-800">Add Stay</h3>
+            <div class="mb-2">
+                <label class="text-xs font-bold text-gray-600 block mb-1">Start Date</label>
+                <input type="date" id="ms_start" class="border p-2 w-full text-xs" aria-label="Stay start date">
+            </div>
+            <div class="mb-2">
+                <label class="text-xs font-bold text-gray-600 block mb-1">End Date</label>
+                <input type="date" id="ms_end" class="border p-2 w-full text-xs" aria-label="Stay end date">
+            </div>
+            <div class="mb-4">
+                <label class="text-xs font-bold text-gray-600 block mb-1">Room Category</label>
+                <select id="ms_category" class="border p-2 w-full text-xs" aria-label="Stay room category"></select>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeMultiStayModal()" class="px-3 py-1 bg-gray-200 rounded text-xs">Cancel</button>
+                <button onclick="addStay()" class="px-3 py-1 bg-[var(--primary-blue)] text-white rounded text-xs">Add</button>
+            </div>
+        </div>
+    </div>
+    <!-- DISCHARGE SUMMARY VIEW -->
+    <!--
+      The discharge summary view is defined outside of the Tariff Master
+      section so that it acts as a peer to the Billing and Tariff
+      views.  This view contains fields for entering a detailed
+      narrative summary of the patient’s course, including operative
+      details and follow‑up instructions.  It is hidden by default and
+      displayed when the user navigates to the Discharge Summary tab.
+    -->
+    <div id="view-summary" class="container-main hidden bg-white shadow p-8 min-h-screen flex flex-col">
+        <h2 class="text-2xl font-bold text-center mb-4">Discharge Summary</h2>
+        <div class="flex-grow overflow-y-auto">
+            <!-- Header details table -->
+            <div class="border border-gray-300 mb-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-2 p-3 text-xs">
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">IPD No.</label>
+                        <input type="text" id="ds_ipdno" class="border p-1 w-full" aria-label="IPD number">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Reg No.</label>
+                        <input type="text" id="ds_regno" class="border p-1 w-full" aria-label="Registration number">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Patient Name</label>
+                        <input type="text" id="ds_name" class="border p-1 w-full" aria-label="Patient name">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Age</label>
+                        <input type="text" id="ds_age" class="border p-1 w-full" aria-label="Age">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Category</label>
+                        <input type="text" id="ds_category" class="border p-1 w-full" aria-label="Category">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Bed No.</label>
+                        <input type="text" id="ds_bedno" class="border p-1 w-full" aria-label="Bed number">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date of Admission</label>
+                        <input type="text" id="ds_doa" class="border p-1 w-full" aria-label="Date of admission">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date of Discharge</label>
+                        <input type="text" id="ds_dod" class="border p-1 w-full" aria-label="Date of discharge">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Consultant Dr.</label>
+                        <input type="text" id="ds_consultant" class="border p-1 w-full" aria-label="Consultant doctor">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Contact No.</label>
+                        <input type="text" id="ds_contact" class="border p-1 w-full" aria-label="Contact number">
+                    </div>
+                </div>
+            </div>
+            <!-- Narrative sections -->
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold mb-1">Diagnosis</label>
+                    <textarea id="ds_diagnosis" rows="2" class="border p-2 w-full" placeholder="Enter diagnosis"></textarea>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Operation / Procedure</label>
+                    <textarea id="ds_procedure" rows="2" class="border p-2 w-full" placeholder="Enter operation or procedure details"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold mb-1">Date of Operation</label>
+                        <input type="date" id="ds_op_date" class="border p-2 w-full">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Surgeons</label>
+                        <input type="text" id="ds_surgeons" class="border p-2 w-full" placeholder="Surgeon names">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Anaesthesiologist</label>
+                        <input type="text" id="ds_anaesthesiologist" class="border p-2 w-full" placeholder="Name of anaesthesiologist">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Implant</label>
+                        <input type="text" id="ds_implant" class="border p-2 w-full" placeholder="Implant details (if any)">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Chief Complaint</label>
+                    <textarea id="ds_chief" rows="2" class="border p-2 w-full" placeholder="Enter chief complaint"></textarea>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">History of Present Illness</label>
+                    <textarea id="ds_history" rows="3" class="border p-2 w-full" placeholder="Enter history of present illness"></textarea>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Past Medical History</label>
+                    <textarea id="ds_past_med" rows="2" class="border p-2 w-full" placeholder="Enter past medical history"></textarea>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Physical Examination</label>
+                    <textarea id="ds_exam" rows="3" class="border p-2 w-full" placeholder="Enter findings on physical examination"></textarea>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Course During Hospital Stay</label>
+                    <textarea id="ds_course" rows="3" class="border p-2 w-full" placeholder="Describe the course of hospital stay"></textarea>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Discharge Advice</label>
+                    <textarea id="ds_advice" rows="2" class="border p-2 w-full" placeholder="Enter discharge medications and advice"></textarea>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Follow Up</label>
+                    <textarea id="ds_followup" rows="2" class="border p-2 w-full" placeholder="Enter follow‑up instructions"></textarea>
+                </div>
+            </div>
+        </div>
+        <!-- Footer buttons -->
+        <div class="mt-4 flex gap-2 justify-end no-print">
+            <button onclick="saveSummary()" class="bg-green-600 text-white font-bold px-4 py-2 rounded">Save Summary</button>
+            <button onclick="prepareSummaryPrint()" class="bg-[var(--primary-blue)] text-white font-bold px-4 py-2 rounded">Print Summary</button>
+        </div>
+    </div>
+
     <!-- Application logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -780,6 +906,8 @@
         window.billItems = [];
         window.receipts = [];
         window.currentBillId = null;
+        // Keep track of stay segments (start, end, category) for visualisation and validation
+        window.staySegments = [];
         let isOnline = false;
         let db, auth, appId;
         let currentUser = null;
@@ -1051,6 +1179,9 @@
             // Refresh auto‑calculation summary whenever the UI rerenders
             if (typeof updateAutoCalcInfo === 'function') updateAutoCalcInfo();
 
+            // Refresh the stay visual bar whenever the UI rerenders
+            if (typeof renderStayBar === 'function') renderStayBar();
+
             // Update the discharge summary with narrative details if available.
             const summaryEl = document.getElementById('dischargeSummary');
             if (summaryEl) {
@@ -1168,7 +1299,8 @@
             }
             const conf = localTariff.roomRates || {};
             const rates = conf[roomType] || { tariff: 0, nursing: 0, doc: 0 };
-            const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            const msPerDay = 1000 * 60 * 60 * 24;
+            const days = Math.max(1, Math.ceil((end - start) / msPerDay));
             for (let i = 0; i < days; i++) {
                 let d = new Date(start);
                 d.setDate(d.getDate() + i);
@@ -1185,12 +1317,14 @@
                 window.billItems = [];
                 window.receipts = [];
                 window.currentBillId = null;
+                window.staySegments = [];
                 document.querySelectorAll('#view-billing input').forEach((i) => (i.value = ''));
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('ui_doa').value = today;
                 document.getElementById('ui_dod').value = today;
                 document.getElementById('ui_rdate').value = today;
                 renderUI();
+                if (typeof renderStayBar === 'function') renderStayBar();
                 generateNewIDs();
             }
         };
@@ -1620,8 +1754,93 @@
             infoEl.textContent = `Stay: ${diffDays} day${diffDays > 1 ? 's' : ''}.`;
             infoEl.classList.remove('hidden');
         };
+
+        /**
+         * Render a visual bar representing the stay segments.  Each segment
+         * occupies a proportional width based on its number of days relative
+         * to the total length of the admission.  Colour coding reflects
+         * different room categories.
+         */
+        window.renderStayBar = () => {
+            const barEl = document.getElementById('stayBar');
+            if (!barEl) return;
+            const startVal = document.getElementById('ui_doa').value;
+            const endVal   = document.getElementById('ui_dod').value;
+            const start = new Date(startVal);
+            const end   = new Date(endVal);
+            if (isNaN(start) || isNaN(end) || start > end) {
+                barEl.innerHTML = '';
+                barEl.classList.add('hidden');
+                return;
+            }
+            const msPerDay = 1000 * 60 * 60 * 24;
+            const totalDays = Math.max(1, Math.floor((end - start) / msPerDay) + 1);
+            if (!window.staySegments || window.staySegments.length === 0) {
+                barEl.innerHTML = '';
+                barEl.classList.add('hidden');
+                return;
+            }
+            barEl.classList.remove('hidden');
+            barEl.innerHTML = '';
+            // Colour mapping for categories
+            const colMap = {
+                'ICU': '#e11d48',
+                'GENERAL WARD': '#22c55e',
+                'SINGLE AC': '#2563eb',
+                'PVT': '#6366f1'
+            };
+            // Build segments
+            window.staySegments.forEach(seg => {
+                const segStart = new Date(seg.start);
+                const segEnd   = new Date(seg.end);
+                // Clip segment to admission range
+                const rangeStart = segStart < start ? start : segStart;
+                const rangeEnd   = segEnd   > end   ? end   : segEnd;
+                const segDays    = Math.max(1, Math.floor((rangeEnd - rangeStart) / msPerDay) + 1);
+                const widthPct   = (segDays / totalDays) * 100;
+                const col = colMap[seg.category] || '#a855f7';
+                const div = document.createElement('div');
+                div.style.width = widthPct + '%';
+                div.style.backgroundColor = col;
+                div.style.color = '#ffffff';
+                div.style.fontSize = '8px';
+                div.style.display = 'inline-flex';
+                div.style.alignItems = 'center';
+                div.style.justifyContent = 'center';
+                div.textContent = seg.category;
+                barEl.appendChild(div);
+            });
+        };
+
+        /**
+         * Validate that the staySegments cover the entire admission period.
+         * Returns true if every day between admission and discharge has at
+         * least one segment covering it; otherwise false.
+         */
+        window.validateStayCoverage = () => {
+            const startVal = document.getElementById('ui_doa').value;
+            const endVal   = document.getElementById('ui_dod').value;
+            const start = new Date(startVal);
+            const end   = new Date(endVal);
+            if (isNaN(start) || isNaN(end) || start > end) return true;
+            const msPerDay = 1000 * 60 * 60 * 24;
+            // iterate inclusive
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                const covered = window.staySegments && window.staySegments.some(seg => {
+                    return new Date(seg.start) <= d && d <= new Date(seg.end);
+                });
+                if (!covered) return false;
+            }
+            return true;
+        };
         // Save the current bill to Firestore or local storage
         window.saveBill = async () => {
+            // Validate that stay segments cover the entire admission period before saving
+            if (typeof validateStayCoverage === 'function' && !validateStayCoverage()) {
+                alert('Stay schedule does not cover the entire admission period. Please ensure each day has a room category assigned using Add Stay.');
+                return;
+            }
+
             const billData = {
                 uhid: document.getElementById('ui_uhid').value,
                 ip: document.getElementById('ui_ip').value,
@@ -1986,7 +2205,7 @@
             const rates = conf[category] || { tariff: 0, nursing: 0, doc: 0 };
             // Calculate number of days including both start and end
             const msPerDay = 1000 * 60 * 60 * 24;
-            const diffDays = Math.floor((end - start) / msPerDay) + 1;
+            const diffDays = Math.max(1, Math.floor((end - start) / msPerDay) + 1);
             for (let i = 0; i < diffDays; i++) {
                 const d = new Date(start);
                 d.setDate(d.getDate() + i);
@@ -1996,8 +2215,13 @@
                 window.addChargeIfNotExists(dateStr, 'NURSING CHARGES', 'Nursing Charges', rates.nursing);
                 window.addChargeIfNotExists(dateStr, 'DOCTOR CHARGE', 'Consultant Visit', rates.doc);
             }
-            // Close modal and refresh UI
+            // Record this stay segment for visualisation and validation
+            try {
+                window.staySegments.push({ start: startVal, end: endVal, category: category });
+            } catch (e) {}
+            // Close modal and refresh UI; also refresh stay bar
             window.closeMultiStayModal();
+            if (typeof renderStayBar === 'function') renderStayBar();
             renderUI();
         };
         // Tab switching
