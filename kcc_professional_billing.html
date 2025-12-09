@@ -372,6 +372,19 @@
             <div id="ui_billBody" class="border-l border-r border-b border-gray-200 min-h-[150px] pb-4">
                 <!-- Rows injected by JS -->
             </div>
+
+            <!-- NEW: Package Add Section -->
+            <div class="no-print mt-2 p-2 bg-teal-50 border border-teal-100 rounded text-xs">
+                <div class="flex gap-2 items-center">
+                    <label class="text-[9px] text-teal-700 font-bold uppercase whitespace-nowrap">Quick Package:</label>
+                    <select id="ui_pkg_select" class="bg-white flex-grow border border-teal-200 rounded p-1 text-gray-700 font-medium">
+                        <option value="">-- Select a Package --</option>
+                    </select>
+                    <button onclick="addSelectedPackage()" class="bg-[var(--accent-color)] text-white font-bold text-xs px-3 py-1.5 rounded hover:bg-[var(--accent-color-hover)] uppercase tracking-wide">Add Pkg</button>
+                </div>
+            </div>
+            <!-- END NEW SECTION -->
+
             <!-- Manual add section -->
             <div class="no-print mt-2 p-2 bg-blue-50 border border-blue-100 rounded text-xs">
                 <div class="flex gap-2 items-end">
@@ -484,7 +497,7 @@
                                 SAVE
                             </button>
                             <button onclick="preparePrint()" class="bg-[var(--primary-blue)] text-white font-bold px-4 py-2 rounded shadow hover:bg-blue-900 transition flex items-center gap-2 justify-center text-xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z"></path></svg>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z"></path></svg>
                                 PRINT FINAL INVOICE
                             </button>
                         </div>
@@ -655,7 +668,7 @@
         <!-- Auto calculation configuration -->
         <div class="mt-8 border rounded shadow-sm bg-gray-50 p-4" id="rateConfigSection">
             <h3 class="font-bold text-lg mb-4 text-gray-800">Auto Calculation Rates</h3>
-            <p class="text-xs text-gray-500 mb-4">Configure the default daily rates used when automatically adding room charges.  These values apply whenever you click the “Auto‑Calc” button on the billing form.  Adjust them to reflect current pricing and click Save to persist.</p>
+            <p class="text-xs text-gray-500 mb-4">Configure the default daily rates used when automatically adding room charges.  These values apply whenever you click the “Auto‑Calc” button on the billing form.  Adjust them to reflect current pricing and click Save to persist.</p>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-xs">
                     <thead class="bg-gray-100">
@@ -753,7 +766,7 @@
         </div>
     </div>
 
-    <!-- Multi‑Stay Modal: allows adding a stay with custom date range and room category.  Placed outside of any specific view so that it can be opened from any tab. -->
+    <!-- Multi‑Stay Modal: allows adding a stay with custom date range and room category.  Placed outside of any specific view so that it can be opened from any tab. -->
     <div id="multiStayModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
         <div class="bg-white p-6 rounded shadow-lg w-80">
             <h3 class="font-bold text-lg mb-4 text-gray-800">Add Stay</h3>
@@ -773,127 +786,6 @@
                 <button onclick="closeMultiStayModal()" class="px-3 py-1 bg-gray-200 rounded text-xs">Cancel</button>
                 <button onclick="addStay()" class="px-3 py-1 bg-[var(--primary-blue)] text-white rounded text-xs">Add</button>
             </div>
-        </div>
-    </div>
-    <!-- DISCHARGE SUMMARY VIEW -->
-    <!--
-      The discharge summary view is defined outside of the Tariff Master
-      section so that it acts as a peer to the Billing and Tariff
-      views.  This view contains fields for entering a detailed
-      narrative summary of the patient’s course, including operative
-      details and follow‑up instructions.  It is hidden by default and
-      displayed when the user navigates to the Discharge Summary tab.
-    -->
-    <div id="view-summary" class="container-main hidden bg-white shadow p-8 min-h-screen flex flex-col">
-        <h2 class="text-2xl font-bold text-center mb-4">Discharge Summary</h2>
-        <div class="flex-grow overflow-y-auto">
-            <!-- Header details table -->
-            <div class="border border-gray-300 mb-4">
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-2 p-3 text-xs">
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">IPD No.</label>
-                        <input type="text" id="ds_ipdno" class="border p-1 w-full" aria-label="IPD number">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Reg No.</label>
-                        <input type="text" id="ds_regno" class="border p-1 w-full" aria-label="Registration number">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Patient Name</label>
-                        <input type="text" id="ds_name" class="border p-1 w-full" aria-label="Patient name">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Age</label>
-                        <input type="text" id="ds_age" class="border p-1 w-full" aria-label="Age">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Category</label>
-                        <input type="text" id="ds_category" class="border p-1 w-full" aria-label="Category">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Bed No.</label>
-                        <input type="text" id="ds_bedno" class="border p-1 w-full" aria-label="Bed number">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date of Admission</label>
-                        <input type="text" id="ds_doa" class="border p-1 w-full" aria-label="Date of admission">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date of Discharge</label>
-                        <input type="text" id="ds_dod" class="border p-1 w-full" aria-label="Date of discharge">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Consultant Dr.</label>
-                        <input type="text" id="ds_consultant" class="border p-1 w-full" aria-label="Consultant doctor">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Contact No.</label>
-                        <input type="text" id="ds_contact" class="border p-1 w-full" aria-label="Contact number">
-                    </div>
-                </div>
-            </div>
-            <!-- Narrative sections -->
-            <div class="space-y-4 text-xs">
-                <div>
-                    <label class="block font-bold mb-1">Diagnosis</label>
-                    <textarea id="ds_diagnosis" rows="2" class="border p-2 w-full" placeholder="Enter diagnosis"></textarea>
-                </div>
-                <div>
-                    <label class="block font-bold mb-1">Operation / Procedure</label>
-                    <textarea id="ds_procedure" rows="2" class="border p-2 w-full" placeholder="Enter operation or procedure details"></textarea>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-bold mb-1">Date of Operation</label>
-                        <input type="date" id="ds_op_date" class="border p-2 w-full">
-                    </div>
-                    <div>
-                        <label class="block font-bold mb-1">Surgeons</label>
-                        <input type="text" id="ds_surgeons" class="border p-2 w-full" placeholder="Surgeon names">
-                    </div>
-                    <div>
-                        <label class="block font-bold mb-1">Anaesthesiologist</label>
-                        <input type="text" id="ds_anaesthesiologist" class="border p-2 w-full" placeholder="Name of anaesthesiologist">
-                    </div>
-                    <div>
-                        <label class="block font-bold mb-1">Implant</label>
-                        <input type="text" id="ds_implant" class="border p-2 w-full" placeholder="Implant details (if any)">
-                    </div>
-                </div>
-                <div>
-                    <label class="block font-bold mb-1">Chief Complaint</label>
-                    <textarea id="ds_chief" rows="2" class="border p-2 w-full" placeholder="Enter chief complaint"></textarea>
-                </div>
-                <div>
-                    <label class="block font-bold mb-1">History of Present Illness</label>
-                    <textarea id="ds_history" rows="3" class="border p-2 w-full" placeholder="Enter history of present illness"></textarea>
-                </div>
-                <div>
-                    <label class="block font-bold mb-1">Past Medical History</label>
-                    <textarea id="ds_past_med" rows="2" class="border p-2 w-full" placeholder="Enter past medical history"></textarea>
-                </div>
-                <div>
-                    <label class="block font-bold mb-1">Physical Examination</label>
-                    <textarea id="ds_exam" rows="3" class="border p-2 w-full" placeholder="Enter findings on physical examination"></textarea>
-                </div>
-                <div>
-                    <label class="block font-bold mb-1">Course During Hospital Stay</label>
-                    <textarea id="ds_course" rows="3" class="border p-2 w-full" placeholder="Describe the course of hospital stay"></textarea>
-                </div>
-                <div>
-                    <label class="block font-bold mb-1">Discharge Advice</label>
-                    <textarea id="ds_advice" rows="2" class="border p-2 w-full" placeholder="Enter discharge medications and advice"></textarea>
-                </div>
-                <div>
-                    <label class="block font-bold mb-1">Follow Up</label>
-                    <textarea id="ds_followup" rows="2" class="border p-2 w-full" placeholder="Enter follow‑up instructions"></textarea>
-                </div>
-            </div>
-        </div>
-        <!-- Footer buttons -->
-        <div class="mt-4 flex gap-2 justify-end no-print">
-            <button onclick="saveSummary()" class="bg-green-600 text-white font-bold px-4 py-2 rounded">Save Summary</button>
-            <button onclick="prepareSummaryPrint()" class="bg-[var(--primary-blue)] text-white font-bold px-4 py-2 rounded">Print Summary</button>
         </div>
     </div>
 
@@ -1003,7 +895,7 @@
             for (let i = 0; i < 12; i++) { result += chars.charAt(Math.floor(Math.random() * chars.length)); }
             return result;
         };
-        // Firebase initialisation and auth handler.  Falls back to local mode
+        // Firebase initialisation and auth handler.  Falls back to local mode
         // if config is missing.
         async function initApp() {
             const statusEl = document.getElementById('authStatus');
@@ -1245,8 +1137,8 @@
             renderUI();
         };
         window.addReceipt = () => {
-            const rno  = document.getElementById('ui_rno').value;
-            const amt  = document.getElementById('ui_ramt').value;
+            const rno  = document.getElementById('ui_rno').value;
+            const amt  = document.getElementById('ui_ramt').value;
             const date = document.getElementById('ui_rdate').value;
             const mode = document.getElementById('ui_rmode').value;
             const desc = document.getElementById('ui_rdesc').value;
@@ -1268,10 +1160,10 @@
         /**
          * Helper to add a billing line only if it does not already exist.
          * Prevents duplicate charges for the same date, category and description.
-         * @param {string} dateStr  ISO date string (YYYY-MM-DD)
+         * @param {string} dateStr  ISO date string (YYYY-MM-DD)
          * @param {string} category Billing category (e.g. "ROOM RENT")
-         * @param {string} desc     Line description
-         * @param {number} rate     Charge amount
+         * @param {string} desc     Line description
+         * @param {number} rate     Charge amount
          */
         window.addChargeIfNotExists = (dateStr, category, desc, rate) => {
             // Search existing items for a matching date, category and description
@@ -1394,9 +1286,9 @@
             }
         };
 
-        // Quickly add a tariff item into the billing table.  This helper
+        // Quickly add a tariff item into the billing table.  This helper
         // speeds up billing by allowing users to insert lines from the
-        // tariff master directly.  The item will be dated with the
+        // tariff master directly.  The item will be dated with the
         // discharge date by default.
         window.addTariffToBill = (cat, idx) => {
             const item = (localTariff[cat] || [])[idx];
@@ -1414,10 +1306,10 @@
         };
 
         /**
-         * Add a surgical package to the bill.  Breaks down the package
+         * Add a surgical package to the bill.  Breaks down the package
          * definition into multiple billing lines corresponding to the
          * appropriate categories (surgeon fees, assistant, anaesthesia,
-         * OT, PAC, ICU and gas).  Each charge is dated with the
+         * OT, PAC, ICU and gas).  Each charge is dated with the
          * discharge date by default.
          */
         window.addSurgicalPackageToBill = (idx) => {
@@ -1444,7 +1336,7 @@
             renderUI();
         };
         /**
-         * Add a lab investigation package to the bill.  Each test within
+         * Add a lab investigation package to the bill.  Each test within
          * the package is added as a separate line under the LAB
          * INVESTIGATION category.
          */
@@ -1460,7 +1352,7 @@
             renderUI();
         };
         /**
-         * Add a pharmacy package to the bill.  Consolidates the total
+         * Add a pharmacy package to the bill.  Consolidates the total
          * amount into a single line under the MEDICINE CHARGE category.
          */
         window.addPharmacyPackageToBill = (idx) => {
@@ -1473,9 +1365,9 @@
         };
 
         /**
-         * Open the package modal for adding or editing a package.  The
+         * Open the package modal for adding or editing a package.  The
          * `type` parameter determines which set of fields are displayed
-         * (surgical, lab or pharmacy).  If `idx` is provided, the modal
+         * (surgical, lab or pharmacy).  If `idx` is provided, the modal
          * will populate existing values for editing.
          */
         window.openPackageModal = (type, idx = -1) => {
@@ -1528,7 +1420,7 @@
             }
         };
         /**
-         * Save the package currently edited in the modal.  Determines
+         * Save the package currently edited in the modal.  Determines
          * whether to create a new entry or update an existing one
          * depending on the pkg_edit_index value.
          */
@@ -1584,7 +1476,7 @@
             renderRateConfigUI();
         };
         /**
-         * Delete a package from a given list by index.  Confirm before
+         * Delete a package from a given list by index.  Confirm before
          * deletion.
          */
         window.deletePackage = async (type, idx) => {
@@ -1602,310 +1494,8 @@
             }
         };
 
-        /**
-         * Populate the discharge summary form with current patient and bill
-         * information if available.  Called whenever the summary view is
-         * activated.
-         */
-        window.renderSummaryUI = () => {
-            // Basic patient details from billing form
-            document.getElementById('ds_ipdno').value = document.getElementById('ui_ip').value || '';
-            document.getElementById('ds_regno').value = document.getElementById('ui_uhid').value || '';
-            document.getElementById('ds_name').value = document.getElementById('ui_name').value || '';
-            document.getElementById('ds_category').value = document.getElementById('ui_roomCat').value || '';
-            document.getElementById('ds_doa').value = document.getElementById('ui_doa').value || '';
-            document.getElementById('ds_dod').value = document.getElementById('ui_dod').value || '';
-            document.getElementById('ds_consultant').value = document.getElementById('ui_doc').value || '';
-            // Attempt to load saved summary if exists
-            loadSummary();
-
-            // Ensure that header fields stay in sync even if no saved summary was loaded.
-            // This call updates any missing fields from the billing form.
-            if (typeof syncSummaryHeader === 'function') {
-                syncSummaryHeader();
-            }
-        };
-        /**
-         * Save the discharge summary to local storage keyed by the current
-         * bill ID.  In cloud mode this could be extended to Firestore.
-         */
-        window.saveSummary = () => {
-            const sum = getSummaryData();
-            const key = window.currentBillId || 'temp_' + Date.now();
-            let summaries = JSON.parse(localStorage.getItem('kcc_summaries') || '{}');
-            summaries[key] = sum;
-            localStorage.setItem('kcc_summaries', JSON.stringify(summaries));
-            alert('Discharge summary saved');
-        };
-        /**
-         * Load a saved discharge summary based on the current bill ID, if
-         * available.  Populates form fields.  Called from renderSummaryUI.
-         */
-        window.loadSummary = () => {
-            const key = window.currentBillId;
-            if (!key) return;
-            const summaries = JSON.parse(localStorage.getItem('kcc_summaries') || '{}');
-            const sum = summaries[key];
-            if (sum) {
-                document.getElementById('ds_ipdno').value = sum.ipdno || '';
-                document.getElementById('ds_regno').value = sum.regno || '';
-                document.getElementById('ds_name').value = sum.name || '';
-                document.getElementById('ds_age').value = sum.age || '';
-                document.getElementById('ds_category').value = sum.category || '';
-                document.getElementById('ds_bedno').value = sum.bedno || '';
-                document.getElementById('ds_doa').value = sum.doa || '';
-                document.getElementById('ds_dod').value = sum.dod || '';
-                document.getElementById('ds_consultant').value = sum.consultant || '';
-                document.getElementById('ds_contact').value = sum.contact || '';
-                document.getElementById('ds_diagnosis').value = sum.diagnosis || '';
-                document.getElementById('ds_procedure').value = sum.procedure || '';
-                document.getElementById('ds_op_date').value = sum.opDate || '';
-                document.getElementById('ds_surgeons').value = sum.surgeons || '';
-                document.getElementById('ds_anaesthesiologist').value = sum.anaesthesiologist || '';
-                document.getElementById('ds_implant').value = sum.implant || '';
-                document.getElementById('ds_chief').value = sum.chief || '';
-                document.getElementById('ds_history').value = sum.history || '';
-                document.getElementById('ds_past_med').value = sum.pastMed || '';
-                document.getElementById('ds_exam').value = sum.exam || '';
-                document.getElementById('ds_course').value = sum.course || '';
-                document.getElementById('ds_advice').value = sum.advice || '';
-                document.getElementById('ds_followup').value = sum.follow || '';
-            }
-        };
-        /**
-         * Prepare the discharge summary for printing.  Sets a filename
-         * based on patient name and triggers print.  Only the summary
-         * section will be visible on print.
-         */
-        window.prepareSummaryPrint = () => {
-            const name = document.getElementById('ds_name').value || 'Patient';
-            document.title = `${name}_Discharge_Summary`;
-            // Hide other sections for printing
-            setTimeout(() => window.print(), 100);
-        };
-
-        /**
-         * Synchronise patient details from the billing form to the discharge
-         * summary header fields.  Called whenever the billing UI updates.
-         */
-        window.syncSummaryHeader = () => {
-            if (!document.getElementById('ds_ipdno')) return;
-            document.getElementById('ds_ipdno').value = document.getElementById('ui_ip').value || '';
-            document.getElementById('ds_regno').value = document.getElementById('ui_uhid').value || '';
-            document.getElementById('ds_name').value = document.getElementById('ui_name').value || '';
-            document.getElementById('ds_category').value = document.getElementById('ui_roomCat').value || '';
-            document.getElementById('ds_doa').value = document.getElementById('ui_doa').value || '';
-            document.getElementById('ds_dod').value = document.getElementById('ui_dod').value || '';
-            document.getElementById('ds_consultant').value = document.getElementById('ui_doc').value || '';
-        };
-
-        /**
-         * Collect the current discharge summary form data into an object.
-         */
-        window.getSummaryData = () => {
-            if (!document.getElementById('ds_ipdno')) return {};
-            return {
-                ipdno: document.getElementById('ds_ipdno').value,
-                regno: document.getElementById('ds_regno').value,
-                name: document.getElementById('ds_name').value,
-                age: document.getElementById('ds_age').value,
-                category: document.getElementById('ds_category').value,
-                bedno: document.getElementById('ds_bedno').value,
-                doa: document.getElementById('ds_doa').value,
-                dod: document.getElementById('ds_dod').value,
-                consultant: document.getElementById('ds_consultant').value,
-                contact: document.getElementById('ds_contact').value,
-                diagnosis: document.getElementById('ds_diagnosis').value,
-                procedure: document.getElementById('ds_procedure').value,
-                opDate: document.getElementById('ds_op_date').value,
-                surgeons: document.getElementById('ds_surgeons').value,
-                anaesthesiologist: document.getElementById('ds_anaesthesiologist').value,
-                implant: document.getElementById('ds_implant').value,
-                chief: document.getElementById('ds_chief').value,
-                history: document.getElementById('ds_history').value,
-                pastMed: document.getElementById('ds_past_med').value,
-                exam: document.getElementById('ds_exam').value,
-                course: document.getElementById('ds_course').value,
-                advice: document.getElementById('ds_advice').value,
-                follow: document.getElementById('ds_followup').value
-            };
-        };
-
-        /**
-         * Provide a human‑readable summary for the auto calculation widget.  It
-         * displays the number of days between admission and discharge and the
-         * per‑day rates for the selected room category.  If dates or room
-         * category are missing, the summary is hidden.  Called whenever the
-         * UI rerenders.
-         */
-        window.updateAutoCalcInfo = () => {
-            const infoEl = document.getElementById('autoCalcInfo');
-            if (!infoEl) return;
-            const roomType = document.getElementById('ui_roomCat').value;
-            const start = new Date(document.getElementById('ui_doa').value);
-            const end = new Date(document.getElementById('ui_dod').value);
-            if (!roomType || isNaN(start) || isNaN(end)) {
-                infoEl.classList.add('hidden');
-                infoEl.textContent = '';
-                return;
-            }
-            const diffDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
-            // Describe only the length of stay; omit tariff breakdown to keep the note simple.
-            infoEl.textContent = `Stay: ${diffDays} day${diffDays > 1 ? 's' : ''}.`;
-            infoEl.classList.remove('hidden');
-        };
-
-        /**
-         * Render a visual bar representing the stay segments.  Each segment
-         * occupies a proportional width based on its number of days relative
-         * to the total length of the admission.  Colour coding reflects
-         * different room categories.
-         */
-        window.renderStayBar = () => {
-            const barEl = document.getElementById('stayBar');
-            if (!barEl) return;
-            const startVal = document.getElementById('ui_doa').value;
-            const endVal   = document.getElementById('ui_dod').value;
-            const start = new Date(startVal);
-            const end   = new Date(endVal);
-            if (isNaN(start) || isNaN(end) || start > end) {
-                barEl.innerHTML = '';
-                barEl.classList.add('hidden');
-                return;
-            }
-            const msPerDay = 1000 * 60 * 60 * 24;
-            const totalDays = Math.max(1, Math.floor((end - start) / msPerDay) + 1);
-            if (!window.staySegments || window.staySegments.length === 0) {
-                barEl.innerHTML = '';
-                barEl.classList.add('hidden');
-                return;
-            }
-            barEl.classList.remove('hidden');
-            barEl.innerHTML = '';
-            // Colour mapping for categories
-            const colMap = {
-                'ICU': '#e11d48',
-                'GENERAL WARD': '#22c55e',
-                'SINGLE AC': '#2563eb',
-                'PVT': '#6366f1'
-            };
-            // Build segments
-            window.staySegments.forEach(seg => {
-                const segStart = new Date(seg.start);
-                const segEnd   = new Date(seg.end);
-                // Clip segment to admission range
-                const rangeStart = segStart < start ? start : segStart;
-                const rangeEnd   = segEnd   > end   ? end   : segEnd;
-                const segDays    = Math.max(1, Math.floor((rangeEnd - rangeStart) / msPerDay) + 1);
-                const widthPct   = (segDays / totalDays) * 100;
-                const col = colMap[seg.category] || '#a855f7';
-                const div = document.createElement('div');
-                div.style.width = widthPct + '%';
-                div.style.backgroundColor = col;
-                div.style.color = '#ffffff';
-                div.style.fontSize = '8px';
-                div.style.display = 'inline-flex';
-                div.style.alignItems = 'center';
-                div.style.justifyContent = 'center';
-                div.textContent = seg.category;
-                barEl.appendChild(div);
-            });
-        };
-
-        /**
-         * Validate that the staySegments cover the entire admission period.
-         * Returns true if every day between admission and discharge has at
-         * least one segment covering it; otherwise false.
-         */
-        window.validateStayCoverage = () => {
-            const startVal = document.getElementById('ui_doa').value;
-            const endVal   = document.getElementById('ui_dod').value;
-            const start = new Date(startVal);
-            const end   = new Date(endVal);
-            if (isNaN(start) || isNaN(end) || start > end) return true;
-            const msPerDay = 1000 * 60 * 60 * 24;
-            // iterate inclusive
-            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                const covered = window.staySegments && window.staySegments.some(seg => {
-                    return new Date(seg.start) <= d && d <= new Date(seg.end);
-                });
-                if (!covered) return false;
-            }
-            return true;
-        };
-        // Save the current bill to Firestore or local storage
-        window.saveBill = async () => {
-            // Validate that stay segments cover the entire admission period before saving
-            if (typeof validateStayCoverage === 'function' && !validateStayCoverage()) {
-                alert('Stay schedule does not cover the entire admission period. Please ensure each day has a room category assigned using Add Stay.');
-                return;
-            }
-
-            const billData = {
-                uhid: document.getElementById('ui_uhid').value,
-                ip: document.getElementById('ui_ip').value,
-                name: document.getElementById('ui_name').value,
-                doa: document.getElementById('ui_doa').value,
-                dod: document.getElementById('ui_dod').value,
-                roomCat: document.getElementById('ui_roomCat').value,
-                doc: document.getElementById('ui_doc').value,
-                insurance: document.getElementById('ui_insurance').value,
-                billNo: document.getElementById('b_invoice_no').innerText,
-                billDiscount: document.getElementById('ui_billDiscount').value,
-                items: window.billItems,
-                receipts: window.receipts,
-                updatedAt: new Date().toISOString()
-            };
-            const statusEl = document.getElementById('saveStatus');
-            statusEl.innerText = 'Saving…';
-            statusEl.classList.remove('hidden');
-            if (isOnline) {
-                try {
-                    // If a bill ID already exists, update the existing document
-                    if (window.currentBillId) {
-                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bills', window.currentBillId), billData);
-                    } else {
-                        // Otherwise create a new bill and record its ID
-                        const docRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bills'), billData);
-                        window.currentBillId = docRef.id;
-                    }
-                    statusEl.innerText = 'Saved to Cloud';
-                } catch (e) {
-                    console.error(e);
-                    alert('Cloud Save Error');
-                    statusEl.innerText = 'Error';
-                }
-            } else {
-                // Offline/local saving.  Persist to localStorage
-                let bills = JSON.parse(localStorage.getItem('kcc_bills') || '[]');
-                if (window.currentBillId) {
-                    const idx = bills.findIndex((b) => b.id === window.currentBillId);
-                    if (idx > -1) {
-                        bills[idx] = { ...billData, id: window.currentBillId };
-                    }
-                } else {
-                    // Assign a temporary local ID for new bills
-                    const newId = 'local_' + Date.now();
-                    window.currentBillId = newId;
-                    bills.push({ ...billData, id: newId });
-                }
-                localStorage.setItem('kcc_bills', JSON.stringify(bills));
-                statusEl.innerText = 'Saved Locally';
-                loadLocalData();
-            }
-            // After the bill has been saved and currentBillId assigned, persist the discharge summary.
-            // Saving the summary separately ensures it is associated with the same bill ID.
-            try {
-                if (typeof saveSummary === 'function') {
-                    saveSummary();
-                }
-            } catch (e) {
-                console.warn('Error saving discharge summary', e);
-            }
-            setTimeout(() => statusEl.classList.add('hidden'), 2000);
-        };
         // Cloud data loading
-        const loadTariffFromCloud = () => {
+        function loadTariffFromCloud() {
             const tariffRef = doc(db, 'artifacts', appId, 'public', 'data', 'tariff', 'master');
             onSnapshot(tariffRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -1934,15 +1524,15 @@
                 renderTariffMasterUI();
                 renderRateConfigUI();
             });
-        };
-        const loadHistoryFromCloud = () => {
+        }
+        function loadHistoryFromCloud() {
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'bills'), (snapshot) => {
                 const bills = [];
                 snapshot.forEach((doc) => bills.push({ ...doc.data(), id: doc.id }));
                 renderHistoryTable(bills);
             });
-        };
-        const renderHistoryTable = (bills) => {
+        }
+        function renderHistoryTable(bills) {
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
             bills.forEach((d) => {
@@ -1970,14 +1560,14 @@
                     document.getElementById('ui_insurance').value = d.insurance;
                     document.getElementById('b_invoice_no').innerText = d.billNo;
                     document.getElementById('ui_billDiscount').value = d.billDiscount || 0;
-                    switchView('billing');
-                    renderUI();
+                    window.switchView('billing');
+                    window.renderUI();
                 };
                 tbody.appendChild(tr);
             });
-        };
+        }
         // Dropdown helpers: update category and room selections
-        const updateDropdowns = () => {
+        function updateDropdowns() {
             const catSel = document.getElementById('ui_cat');
             const roomSel = document.getElementById('ui_roomCat');
             const currentVal = catSel.value;
@@ -1997,9 +1587,60 @@
                 opt.text = r;
                 roomSel.add(opt);
             });
+
+            // NEW: Update the package dropdown whenever data changes
+            if (typeof window.updatePackageDropdown === 'function') window.updatePackageDropdown();
+        }
+
+        // NEW: Helper to populate the package dropdown
+        window.updatePackageDropdown = () => {
+            const sel = document.getElementById('ui_pkg_select');
+            if (!sel) return;
+            
+            const currentVal = sel.value; // Persist selection if possible
+            sel.innerHTML = '<option value="">-- Select a Package --</option>';
+            
+            const pkg = localTariff.packages || {};
+            const types = { surgical: 'Surgical', lab: 'Lab', pharmacy: 'Pharmacy' };
+            
+            Object.keys(types).forEach(type => {
+                if (pkg[type] && pkg[type].length > 0) {
+                    const group = document.createElement('optgroup');
+                    group.label = types[type];
+                    pkg[type].forEach((p, idx) => {
+                        const opt = document.createElement('option');
+                        // Store type and index in the value, e.g., "surgical:0"
+                        opt.value = `${type}:${idx}`;
+                        opt.text = p.name;
+                        group.appendChild(opt);
+                    });
+                    sel.appendChild(group);
+                }
+            });
+            
+            if (currentVal) sel.value = currentVal;
         };
+
+        // NEW: Handle adding the selected package
+        window.addSelectedPackage = () => {
+            const val = document.getElementById('ui_pkg_select').value;
+            if (!val) {
+                alert('Please select a package first.');
+                return;
+            }
+            const [type, idxStr] = val.split(':');
+            const idx = parseInt(idxStr);
+            
+            if (type === 'surgical') window.addSurgicalPackageToBill(idx);
+            else if (type === 'lab') window.addLabPackageToBill(idx);
+            else if (type === 'pharmacy') window.addPharmacyPackageToBill(idx);
+            
+            // Reset selection to default
+            document.getElementById('ui_pkg_select').value = "";
+        };
+
         // Render Tariff master list
-        const renderTariffMasterUI = () => {
+        function renderTariffMasterUI() {
             const grid = document.getElementById('tariffGrid');
             grid.innerHTML = '';
             Object.keys(localTariff).filter(key => key !== 'roomRates' && key !== 'packages').forEach((cat) => {
@@ -2111,9 +1752,9 @@
                     <div class="max-h-40 overflow-y-auto">${listHtml}</div>`;
                 grid.appendChild(card);
             }
-        };
+        }
         // Render room rate configuration table
-        const renderRateConfigUI = () => {
+        function renderRateConfigUI() {
             const tbody = document.getElementById('rateConfigBody');
             tbody.innerHTML = '';
             const rates = localTariff.roomRates || {};
@@ -2128,7 +1769,7 @@
                 `;
                 tbody.appendChild(tr);
             });
-        };
+        }
         // Save edited room rate configuration
         window.saveRoomRateConfig = async () => {
             const rates = localTariff.roomRates || {};
@@ -2147,13 +1788,13 @@
             }
             updateDropdowns();
             // Update auto calculation summary to reflect new rates
-            updateAutoCalcInfo();
+            if(typeof window.updateAutoCalcInfo === 'function') window.updateAutoCalcInfo();
             alert('Rates saved successfully');
         };
 
         /**
-         * Open the multi‑stay modal.  Populate the room category options based
-         * on the configured room rates.  This modal allows users to record
+         * Open the multi‑stay modal.  Populate the room category options based
+         * on the configured room rates.  This modal allows users to record
          * stays in multiple categories during a single admission.
          */
         window.openMultiStayModal = () => {
@@ -2181,27 +1822,27 @@
         };
 
         /**
-         * Add charges for a custom stay.  For each day between the start and
+         * Add charges for a custom stay.  For each day between the start and
          * end date (inclusive), insert separate line items for room rent,
          * nursing charges and doctor visit using the rates configured for
-         * the selected room category.  After adding, the modal is closed
+         * the selected room category.  After adding, the modal is closed
          * and the UI is refreshed.
          */
         window.addStay = () => {
             const startVal = document.getElementById('ms_start').value;
-            const endVal   = document.getElementById('ms_end').value;
+            const endVal   = document.getElementById('ms_end').value;
             const category = document.getElementById('ms_category').value;
             if (!startVal || !endVal || !category) {
                 alert('Please set start date, end date and category');
                 return;
             }
             const start = new Date(startVal);
-            const end   = new Date(endVal);
+            const end   = new Date(endVal);
             if (isNaN(start) || isNaN(end) || start > end) {
                 alert('Invalid date range');
                 return;
             }
-            const conf  = localTariff.roomRates || {};
+            const conf  = localTariff.roomRates || {};
             const rates = conf[category] || { tariff: 0, nursing: 0, doc: 0 };
             // Calculate number of days including both start and end
             const msPerDay = 1000 * 60 * 60 * 24;
@@ -2221,9 +1862,298 @@
             } catch (e) {}
             // Close modal and refresh UI; also refresh stay bar
             window.closeMultiStayModal();
-            if (typeof renderStayBar === 'function') renderStayBar();
-            renderUI();
+            if (typeof window.renderStayBar === 'function') window.renderStayBar();
+            window.renderUI();
         };
+
+        // --- MISSING FUNCTIONS RESTORED BELOW ---
+
+        /**
+         * Provide a human‑readable summary for the auto calculation widget.
+         */
+        window.updateAutoCalcInfo = () => {
+            const infoEl = document.getElementById('autoCalcInfo');
+            if (!infoEl) return;
+            const roomType = document.getElementById('ui_roomCat').value;
+            const start = new Date(document.getElementById('ui_doa').value);
+            const end = new Date(document.getElementById('ui_dod').value);
+            if (!roomType || isNaN(start) || isNaN(end)) {
+                infoEl.classList.add('hidden');
+                infoEl.textContent = '';
+                return;
+            }
+            const diffDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
+            infoEl.textContent = `Stay: ${diffDays} day${diffDays > 1 ? 's' : ''}.`;
+            infoEl.classList.remove('hidden');
+        };
+
+        /**
+         * Render a visual bar representing the stay segments.
+         */
+        window.renderStayBar = () => {
+            const barEl = document.getElementById('stayBar');
+            if (!barEl) return;
+            const startVal = document.getElementById('ui_doa').value;
+            const endVal = document.getElementById('ui_dod').value;
+            const start = new Date(startVal);
+            const end = new Date(endVal);
+            if (isNaN(start) || isNaN(end) || start > end) {
+                barEl.innerHTML = '';
+                barEl.classList.add('hidden');
+                return;
+            }
+            const msPerDay = 1000 * 60 * 60 * 24;
+            const totalDays = Math.max(1, Math.floor((end - start) / msPerDay) + 1);
+            if (!window.staySegments || window.staySegments.length === 0) {
+                barEl.innerHTML = '';
+                barEl.classList.add('hidden');
+                return;
+            }
+            barEl.classList.remove('hidden');
+            barEl.innerHTML = '';
+            // Colour mapping for categories
+            const colMap = { 'ICU': '#e11d48', 'GENERAL WARD': '#22c55e', 'SINGLE AC': '#2563eb', 'PVT': '#6366f1' };
+            window.staySegments.forEach(seg => {
+                const segStart = new Date(seg.start);
+                const segEnd = new Date(seg.end);
+                const rangeStart = segStart < start ? start : segStart;
+                const rangeEnd = segEnd > end ? end : segEnd;
+                const segDays = Math.max(1, Math.floor((rangeEnd - rangeStart) / msPerDay) + 1);
+                const widthPct = (segDays / totalDays) * 100;
+                const col = colMap[seg.category] || '#a855f7';
+                const div = document.createElement('div');
+                div.style.width = widthPct + '%';
+                div.style.backgroundColor = col;
+                div.style.color = '#ffffff';
+                div.style.fontSize = '8px';
+                div.style.display = 'inline-flex';
+                div.style.alignItems = 'center';
+                div.style.justifyContent = 'center';
+                div.textContent = seg.category;
+                barEl.appendChild(div);
+            });
+        };
+
+        /**
+         * Validate that the staySegments cover the entire admission period.
+         */
+        window.validateStayCoverage = () => {
+            const startVal = document.getElementById('ui_doa').value;
+            const endVal = document.getElementById('ui_dod').value;
+            const start = new Date(startVal);
+            const end = new Date(endVal);
+            if (isNaN(start) || isNaN(end) || start > end) return true;
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                const covered = window.staySegments && window.staySegments.some(seg => {
+                    return new Date(seg.start) <= d && d <= new Date(seg.end);
+                });
+                if (!covered) return false;
+            }
+            return true;
+        };
+
+        /**
+         * Save the current bill to Firestore or local storage.
+         */
+        window.saveBill = async () => {
+             // Validate that stay segments cover the entire admission period before saving
+            if (typeof window.validateStayCoverage === 'function' && !window.validateStayCoverage()) {
+                alert('Stay schedule does not cover the entire admission period. Please ensure each day has a room category assigned using Add Stay.');
+                return;
+            }
+
+            const billData = {
+                uhid: document.getElementById('ui_uhid').value,
+                ip: document.getElementById('ui_ip').value,
+                name: document.getElementById('ui_name').value,
+                doa: document.getElementById('ui_doa').value,
+                dod: document.getElementById('ui_dod').value,
+                roomCat: document.getElementById('ui_roomCat').value,
+                doc: document.getElementById('ui_doc').value,
+                insurance: document.getElementById('ui_insurance').value,
+                billNo: document.getElementById('b_invoice_no').innerText,
+                billDiscount: document.getElementById('ui_billDiscount').value,
+                items: window.billItems,
+                receipts: window.receipts,
+                updatedAt: new Date().toISOString()
+            };
+            const statusEl = document.getElementById('saveStatus');
+            statusEl.innerText = 'Saving…';
+            statusEl.classList.remove('hidden');
+            if (isOnline) {
+                try {
+                    if (window.currentBillId) {
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bills', window.currentBillId), billData);
+                    } else {
+                        const docRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bills'), billData);
+                        window.currentBillId = docRef.id;
+                    }
+                    statusEl.innerText = 'Saved to Cloud';
+                } catch (e) {
+                    console.error(e);
+                    alert('Cloud Save Error');
+                    statusEl.innerText = 'Error';
+                }
+            } else {
+                let bills = JSON.parse(localStorage.getItem('kcc_bills') || '[]');
+                if (window.currentBillId) {
+                    const idx = bills.findIndex((b) => b.id === window.currentBillId);
+                    if (idx > -1) {
+                        bills[idx] = { ...billData, id: window.currentBillId };
+                    }
+                } else {
+                    const newId = 'local_' + Date.now();
+                    window.currentBillId = newId;
+                    bills.push({ ...billData, id: newId });
+                }
+                localStorage.setItem('kcc_bills', JSON.stringify(bills));
+                statusEl.innerText = 'Saved Locally';
+                loadLocalData();
+            }
+            try {
+                if (typeof window.saveSummary === 'function') {
+                    window.saveSummary();
+                }
+            } catch (e) {
+                console.warn('Error saving discharge summary', e);
+            }
+            setTimeout(() => statusEl.classList.add('hidden'), 2000);
+        };
+        
+        // --- END RESTORED FUNCTIONS ---
+
+        /**
+         * Populate the discharge summary form with current patient and bill
+         * information if available.  Called whenever the summary view is
+         * activated.
+         */
+        window.renderSummaryUI = () => {
+            // Basic patient details from billing form
+            if(document.getElementById('ds_ipdno')) document.getElementById('ds_ipdno').value = document.getElementById('ui_ip').value || '';
+            if(document.getElementById('ds_regno')) document.getElementById('ds_regno').value = document.getElementById('ui_uhid').value || '';
+            if(document.getElementById('ds_name')) document.getElementById('ds_name').value = document.getElementById('ui_name').value || '';
+            if(document.getElementById('ds_category')) document.getElementById('ds_category').value = document.getElementById('ui_roomCat').value || '';
+            if(document.getElementById('ds_doa')) document.getElementById('ds_doa').value = document.getElementById('ui_doa').value || '';
+            if(document.getElementById('ds_dod')) document.getElementById('ds_dod').value = document.getElementById('ui_dod').value || '';
+            if(document.getElementById('ds_consultant')) document.getElementById('ds_consultant').value = document.getElementById('ui_doc').value || '';
+            // Attempt to load saved summary if exists
+            loadSummary();
+
+            // Ensure that header fields stay in sync even if no saved summary was loaded.
+            // This call updates any missing fields from the billing form.
+            if (typeof window.syncSummaryHeader === 'function') {
+                window.syncSummaryHeader();
+            }
+        };
+
+        /**
+         * Save the discharge summary to local storage keyed by the current
+         * bill ID.  In cloud mode this could be extended to Firestore.
+         */
+        window.saveSummary = () => {
+            const sum = getSummaryData();
+            const key = window.currentBillId || 'temp_' + Date.now();
+            let summaries = JSON.parse(localStorage.getItem('kcc_summaries') || '{}');
+            summaries[key] = sum;
+            localStorage.setItem('kcc_summaries', JSON.stringify(summaries));
+            alert('Discharge summary saved');
+        };
+
+        /**
+         * Load a saved discharge summary based on the current bill ID, if
+         * available.  Populates form fields.  Called from renderSummaryUI.
+         */
+        window.loadSummary = () => {
+            const key = window.currentBillId;
+            if (!key) return;
+            const summaries = JSON.parse(localStorage.getItem('kcc_summaries') || '{}');
+            const sum = summaries[key];
+            if (sum) {
+                if(document.getElementById('ds_ipdno')) document.getElementById('ds_ipdno').value = sum.ipdno || '';
+                if(document.getElementById('ds_regno')) document.getElementById('ds_regno').value = sum.regno || '';
+                if(document.getElementById('ds_name')) document.getElementById('ds_name').value = sum.name || '';
+                if(document.getElementById('ds_age')) document.getElementById('ds_age').value = sum.age || '';
+                if(document.getElementById('ds_category')) document.getElementById('ds_category').value = sum.category || '';
+                if(document.getElementById('ds_bedno')) document.getElementById('ds_bedno').value = sum.bedno || '';
+                if(document.getElementById('ds_doa')) document.getElementById('ds_doa').value = sum.doa || '';
+                if(document.getElementById('ds_dod')) document.getElementById('ds_dod').value = sum.dod || '';
+                if(document.getElementById('ds_consultant')) document.getElementById('ds_consultant').value = sum.consultant || '';
+                if(document.getElementById('ds_contact')) document.getElementById('ds_contact').value = sum.contact || '';
+                if(document.getElementById('ds_diagnosis')) document.getElementById('ds_diagnosis').value = sum.diagnosis || '';
+                if(document.getElementById('ds_procedure')) document.getElementById('ds_procedure').value = sum.procedure || '';
+                if(document.getElementById('ds_op_date')) document.getElementById('ds_op_date').value = sum.opDate || '';
+                if(document.getElementById('ds_surgeons')) document.getElementById('ds_surgeons').value = sum.surgeons || '';
+                if(document.getElementById('ds_anaesthesiologist')) document.getElementById('ds_anaesthesiologist').value = sum.anaesthesiologist || '';
+                if(document.getElementById('ds_implant')) document.getElementById('ds_implant').value = sum.implant || '';
+                if(document.getElementById('ds_chief')) document.getElementById('ds_chief').value = sum.chief || '';
+                if(document.getElementById('ds_history')) document.getElementById('ds_history').value = sum.history || '';
+                if(document.getElementById('ds_past_med')) document.getElementById('ds_past_med').value = sum.pastMed || '';
+                if(document.getElementById('ds_exam')) document.getElementById('ds_exam').value = sum.exam || '';
+                if(document.getElementById('ds_course')) document.getElementById('ds_course').value = sum.course || '';
+                if(document.getElementById('ds_advice')) document.getElementById('ds_advice').value = sum.advice || '';
+                if(document.getElementById('ds_followup')) document.getElementById('ds_followup').value = sum.follow || '';
+            }
+        };
+
+        /**
+         * Prepare the discharge summary for printing.  Sets a filename
+         * based on patient name and triggers print.  Only the summary
+         * section will be visible on print.
+         */
+        window.prepareSummaryPrint = () => {
+            const name = document.getElementById('ds_name').value || 'Patient';
+            document.title = `${name}_Discharge_Summary`;
+            // Hide other sections for printing (handled by CSS)
+            setTimeout(() => window.print(), 100);
+        };
+
+        /**
+         * Synchronise patient details from the billing form to the discharge
+         * summary header fields.  Called whenever the billing UI updates.
+         */
+        window.syncSummaryHeader = () => {
+            if (!document.getElementById('ds_ipdno')) return;
+            document.getElementById('ds_ipdno').value = document.getElementById('ui_ip').value || '';
+            document.getElementById('ds_regno').value = document.getElementById('ui_uhid').value || '';
+            document.getElementById('ds_name').value = document.getElementById('ui_name').value || '';
+            document.getElementById('ds_category').value = document.getElementById('ui_roomCat').value || '';
+            document.getElementById('ds_doa').value = document.getElementById('ui_doa').value || '';
+            document.getElementById('ds_dod').value = document.getElementById('ui_dod').value || '';
+            document.getElementById('ds_consultant').value = document.getElementById('ui_doc').value || '';
+        };
+
+        /**
+         * Collect the current discharge summary form data into an object.
+         */
+        window.getSummaryData = () => {
+            if (!document.getElementById('ds_ipdno')) return {};
+            return {
+                ipdno: document.getElementById('ds_ipdno').value,
+                regno: document.getElementById('ds_regno').value,
+                name: document.getElementById('ds_name').value,
+                age: document.getElementById('ds_age').value,
+                category: document.getElementById('ds_category').value,
+                bedno: document.getElementById('ds_bedno').value,
+                doa: document.getElementById('ds_doa').value,
+                dod: document.getElementById('ds_dod').value,
+                consultant: document.getElementById('ds_consultant').value,
+                contact: document.getElementById('ds_contact').value,
+                diagnosis: document.getElementById('ds_diagnosis').value,
+                procedure: document.getElementById('ds_procedure').value,
+                opDate: document.getElementById('ds_op_date').value,
+                surgeons: document.getElementById('ds_surgeons').value,
+                anaesthesiologist: document.getElementById('ds_anaesthesiologist').value,
+                implant: document.getElementById('ds_implant').value,
+                chief: document.getElementById('ds_chief').value,
+                history: document.getElementById('ds_history').value,
+                pastMed: document.getElementById('ds_past_med').value,
+                exam: document.getElementById('ds_exam').value,
+                course: document.getElementById('ds_course').value,
+                advice: document.getElementById('ds_advice').value,
+                follow: document.getElementById('ds_followup').value
+            };
+        };
+
         // Tab switching
         window.switchView = (view) => {
             ['billing','history','tariff','summary'].forEach((v) => {
@@ -2238,7 +2168,7 @@
             if (newTab) newTab.classList.add('active');
             if (view === 'summary') {
                 // Populate summary fields when switching to summary view
-                renderSummaryUI();
+                window.renderSummaryUI();
             }
         };
         // Autocomplete for description based on category
@@ -2274,14 +2204,7 @@
         document.getElementById('ui_rdate').value = today;
         // Start the app
         initApp();
-        // Register service worker for Progressive Web App installation
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then((reg) => console.log('Service worker registered', reg))
-                    .catch((err) => console.error('Service worker registration failed', err));
-            });
-        }
+        // Service worker registration removed to prevent console errors in preview environment
     </script>
 </body>
 </html>
