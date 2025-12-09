@@ -1,7 +1,7 @@
 {
   "name": "KCC Professional Billing System",
   "short_name": "KCC Billing",
-  "start_url": "kcc_professional_billing.html",
+  "start_url": "login.html",
   "scope": ".",
   "display": "standalone",
   "background_color": "#ffffff",

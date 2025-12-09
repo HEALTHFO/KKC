@@ -8,13 +8,17 @@
  * deploying new versions.
  */
 
-const CACHE_NAME = 'kcc-billing-cache-v1';
+const CACHE_NAME = 'kcc-billing-cache-v2';
 const CORE_ASSETS = [
+  // Entry pages
+  'login.html',
   'kcc_professional_billing.html',
+  // Manifest and worker
   'manifest.json',
   'service-worker.js',
-  'logo.png',
-  // Note: Add other assets that should be cached for offline use
+  // Icons and other static assets
+  'logo.png'
+  // Add other assets (CSS/JS) here if needed for offline use
 ];
 
 self.addEventListener('install', (event) => {
@@ -46,7 +50,7 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate') {
     // Navigation requests: serve cached index or fallback to network
     event.respondWith(
-      caches.match('kcc_professional_billing.html').then((cached) => {
+      caches.match('login.html').then((cached) => {
         return cached || fetch(request);
       })
     );
