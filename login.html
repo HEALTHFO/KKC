@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>KCC Billing Login</title>
+</head>
+<body>
+  <h2>Please sign in</h2>
+  <form onsubmit="return login()">
+    <input id="userid" placeholder="User ID"><br>
+    <input id="password" type="password" placeholder="Password"><br>
+    <button type="submit">Login</button>
+  </form>
+  <script>
+    function login() {
+      const id = document.getElementById('userid').value;
+      const pw = document.getElementById('password').value;
+      if (id === 'KKC' && pw === 'KKC') {
+        window.location.href = 'kcc_professional_billing.html'; // or index.html
+      } else {
+        alert('Invalid credentials');
+      }
+      return false; // prevent form submission
+    }
+  </script>
+</body>
+</html>
