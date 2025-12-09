@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KCC Billing Login</title>
     <!--
-      A simple, responsive login page for the KCC billing system.  This page
-      provides a single point of entry for the application.  Users must
-      authenticate with the hard‑coded credentials (User ID: KKC, Password: KKC).
-      Successful login redirects to the main billing page.  Styling is kept
-      lightweight and fully self‑contained so that the page looks professional
-      even when offline via the service worker cache.
+      A simple, responsive login page for the KCC billing system.
+      Users must authenticate with the hard-coded credentials (User ID: KKC, Password: KKC).
+      Successful login redirects to the main billing page.
+      Styling is kept lightweight and fully self-contained for offline use.
     -->
     <style>
       :root {
@@ -112,10 +110,8 @@
     </div>
     <script>
       /**
-       * Simple client‑side login validation.  For demonstration purposes only.
-       * Accepts User ID "KKC" and Password "KKC" and redirects to the
-       * main billing application.  In a production system this logic would
-       * be replaced with a proper authentication mechanism.
+       * Simple client-side login validation.
+       * Accepts User ID "KKC" and Password "KKC" and redirects to the main billing application.
        */
       function login(event) {
         event.preventDefault();
