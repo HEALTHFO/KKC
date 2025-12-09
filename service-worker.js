@@ -8,7 +8,7 @@
  * deploying new versions.
  */
 
-const CACHE_NAME = 'kcc-billing-cache-v2';
+const CACHE_NAME = 'kcc-billing-cache-v3';
 const CORE_ASSETS = [
   // Entry pages
   'login.html',
@@ -48,11 +48,11 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (request.method !== 'GET') return;
   if (request.mode === 'navigate') {
-    // Navigation requests: serve cached index or fallback to network
+    // For navigation requests (HTML pages), try the network first so
+    // that navigation to other pages (e.g. billing page) works as expected.
+    // If the network fails (offline), fall back to the cached login page.
     event.respondWith(
-      caches.match('login.html').then((cached) => {
-        return cached || fetch(request);
-      })
+      fetch(request).catch(() => caches.match('login.html'))
     );
     return;
   }
