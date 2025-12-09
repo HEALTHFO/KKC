@@ -1133,6 +1133,31 @@
             window.receipts.splice(idx, 1);
             renderUI();
         };
+
+        /**
+         * Helper to add a billing line only if it does not already exist.
+         * Prevents duplicate charges for the same date, category and description.
+         * @param {string} dateStr  ISO date string (YYYY-MM-DD)
+         * @param {string} category Billing category (e.g. "ROOM RENT")
+         * @param {string} desc     Line description
+         * @param {number} rate     Charge amount
+         */
+        window.addChargeIfNotExists = (dateStr, category, desc, rate) => {
+            // Search existing items for a matching date, category and description
+            const exists = window.billItems.some(item => {
+                return item.date === dateStr && item.category === category && item.desc === desc;
+            });
+            if (!exists) {
+                window.billItems.push({
+                    category: category,
+                    desc: desc,
+                    rate: rate,
+                    qty: 1,
+                    date: dateStr,
+                    discount: 0
+                });
+            }
+        };
         window.addRoomDays = () => {
             const roomType = document.getElementById('ui_roomCat').value;
             const start = new Date(document.getElementById('ui_doa').value);
@@ -1148,11 +1173,10 @@
                 let d = new Date(start);
                 d.setDate(d.getDate() + i);
                 const dateStr = d.toISOString().split('T')[0];
-                window.billItems.push(
-                    { category: 'ROOM RENT', desc: `Room: ${roomType}`, rate: rates.tariff, qty: 1, date: dateStr, discount: 0 },
-                    { category: 'NURSING CHARGES', desc: 'Nursing Charges', rate: rates.nursing, qty: 1, date: dateStr, discount: 0 },
-                    { category: 'DOCTOR CHARGE', desc: 'Consultant Visit', rate: rates.doc, qty: 1, date: dateStr, discount: 0 }
-                );
+                // Add charges only if they do not already exist for this date
+                window.addChargeIfNotExists(dateStr, 'ROOM RENT', `Room: ${roomType}`, rates.tariff);
+                window.addChargeIfNotExists(dateStr, 'NURSING CHARGES', 'Nursing Charges', rates.nursing);
+                window.addChargeIfNotExists(dateStr, 'DOCTOR CHARGE', 'Consultant Visit', rates.doc);
             }
             renderUI();
         };
@@ -1967,11 +1991,10 @@
                 const d = new Date(start);
                 d.setDate(d.getDate() + i);
                 const dateStr = d.toISOString().split('T')[0];
-                window.billItems.push(
-                    { category: 'ROOM RENT', desc: `Room: ${category}`, rate: rates.tariff, qty: 1, date: dateStr, discount: 0 },
-                    { category: 'NURSING CHARGES', desc: 'Nursing Charges', rate: rates.nursing, qty: 1, date: dateStr, discount: 0 },
-                    { category: 'DOCTOR CHARGE', desc: 'Consultant Visit', rate: rates.doc, qty: 1, date: dateStr, discount: 0 }
-                );
+                // Add charges only if they do not already exist for this date and description
+                window.addChargeIfNotExists(dateStr, 'ROOM RENT', `Room: ${category}`, rates.tariff);
+                window.addChargeIfNotExists(dateStr, 'NURSING CHARGES', 'Nursing Charges', rates.nursing);
+                window.addChargeIfNotExists(dateStr, 'DOCTOR CHARGE', 'Consultant Visit', rates.doc);
             }
             // Close modal and refresh UI
             window.closeMultiStayModal();
